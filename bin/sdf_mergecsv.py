@@ -46,6 +46,6 @@ print(' ')
 df = pd.merge(df1, df2, left_on=key1, right_on=key2, how='left', suffixes=('', '_1'))
 
 fn = os.path.splitext(sdf)[0]
-rdkit.Chem.PandasTools.WriteSDF(df, fn+'_merged.sdf', molColName='Molecule', idName='compound_id', properties=df.columns, allNumeric=False)
+rdkit.Chem.PandasTools.WriteSDF(df, fn+'_merged.sdf', molColName='Molecule', idName=key2, properties=df.columns, allNumeric=False)
 
 print('_merged.sdf is generated')
