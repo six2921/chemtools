@@ -1,4 +1,4 @@
-#! /home/siu/anaconda3/envs/rdkit/bin/python
+#! /home/siu/anaconda/envs/chem/bin/python
 
 import pandas as pd
 from pandas.api.types import is_numeric_dtype

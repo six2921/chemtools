@@ -1,11 +1,11 @@
-#! /home/siu/anaconda3/envs/rdkit/bin/python
+#! /home/siu/anaconda/envs/chem/bin/python
 
 import pandas as pd 
 import itertools
 import argparse
 import os
 
-parser = argparse.ArgumentParser(description = 'ex) Assay conc column have two types of values, 10uM, 3uM. You can specify this column.')
+parser = argparse.ArgumentParser(description = 'ex) Assay concentration column have two types of values, 10uM, 3uM. You can specify this column.')
 parser.add_argument('file', help='csv file')
 
 args = parser.parse_args()
