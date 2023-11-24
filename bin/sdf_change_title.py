@@ -1,9 +1,7 @@
 #! /home/siu/anaconda/envs/chem/bin/python
 
 import argparse
-import shutil
 import os
-import sys
 
 from rdkit import Chem
 

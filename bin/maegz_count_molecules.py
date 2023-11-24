@@ -1,7 +1,7 @@
 #! /home/siu/anaconda/envs/chem/bin/python
 
 import argparse
-import os
+from schrodinger import structure
 
 parser = argparse.ArgumentParser(description = 'count cpds in maegz')
 parser.add_argument('file', metavar='file', help='input .maegz files')
@@ -10,8 +10,7 @@ args = parser.parse_args()
 file = args.file
 name = file.split('.maegz')[0]
 
-import gzip
-from schrodinger import structure
+
 
 # maegz 파일 읽기
 suppl = structure.StructureReader(file)

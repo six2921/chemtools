@@ -1,7 +1,6 @@
 #! /home/siu/anaconda/envs/chem/bin/python
 
 import argparse
-import os
 
 parser = argparse.ArgumentParser(description = 'split into N files from maegz (max=100T cps)')
 parser.add_argument('file', metavar='file', help='input .maegz files')

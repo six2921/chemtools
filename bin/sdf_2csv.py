@@ -2,8 +2,6 @@
 
 import argparse
 import os
-import pandas as pd
-import rdkit
 from rdkit.Chem import PandasTools
 
 

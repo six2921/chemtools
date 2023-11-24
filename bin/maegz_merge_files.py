@@ -1,7 +1,6 @@
 #! /home/siu/anaconda/envs/chem/bin/python
 
 import argparse
-import os
 import glob
 
 parser = argparse.ArgumentParser(description = 'Merge name_prefix_*.maegz files into one file')

@@ -1,8 +1,6 @@
 #! /home/siu/anaconda/envs/chem/bin/python
 
 import pandas as pd
-from pandas.api.types import is_numeric_dtype
-import os
 import argparse
 
 parser = argparse.ArgumentParser(description = 'Organize your csv file')

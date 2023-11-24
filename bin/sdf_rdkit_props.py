@@ -2,7 +2,6 @@
 
 import argparse, os, time, glob, shutil
 from rdkit import Chem
-from rdkit.Chem import Descriptors
 from rdkit.Chem import AllChem
 import csv
 from natsort import natsorted

@@ -1,10 +1,7 @@
 #! /home/siu/anaconda/envs/chem/bin/python
 
-import rdkit
 from rdkit.Chem import rdmolfiles
-import gzip
 import argparse
-import os
 
 parser = argparse.ArgumentParser(description = 'count num of cpds in mae or maegz')
 parser.add_argument('file', metavar='file', help='input .sdf files')
