@@ -38,8 +38,10 @@ while 1:
             print("<Please enter numbers only>")
             continue
 
+sub_merge = sub_merge.drop_duplicates(subset=[id_column])
+
 if len(sub_merge) > 0:
     # 파일 쓰기
     new_filename = sdf.split('.')[0] + "_subset.sdf"
-    PandasTools.WriteSDF(sub_merge, new_filename)
+    PandasTools.WriteSDF(sub_merge, new_filename,  idName=id_column, properties=list(df.columns))
     print(f"{sub_merge[id_column].unique()} cpds are written to {new_filename}")
