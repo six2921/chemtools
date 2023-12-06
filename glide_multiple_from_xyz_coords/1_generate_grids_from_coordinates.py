@@ -8,6 +8,10 @@ import subprocess
 parser = argparse.ArgumentParser(description='Generate grids from coordinates in csv file')
 parser.add_argument('dir_path', type=str, help='coordinates.csv and receptor.mae must be in this directory')
 
+# 스크립트 경로
+script_path = os.path.dirname(os.path.realpath(__file__))
+os.chdir(script_path)
+
 # 슈뢰딩거 파일 경로 읽기
 with open('path_of_schrodinger.txt', 'r') as file:
     SRDG = file.readline().strip('PATH: ').strip()
