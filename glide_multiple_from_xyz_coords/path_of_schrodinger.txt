@@ -1,3 +1,0 @@
-PATH /opt/schrodinger2023-4
-HOST localhost
-
