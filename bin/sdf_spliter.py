@@ -1,7 +1,5 @@
 #! /home/siu/anaconda/envs/chem/bin/python
 
-from rdkit import Chem
-import math
 import os
 import argparse
 
@@ -11,18 +9,23 @@ parser.add_argument('bunch', help='how many molecules per a file') # 필요한 �
 args = parser.parse_args()
 
 sdf = args.sdf
-bunch = args.bunch
-bunch = int(bunch)
+bunch = int(args.bunch)
 
-supplier = Chem.SDMolSupplier(sdf)
 fn = os.path.splitext(sdf)[0]
+counter = 0
+file_counter = 0
+output_file = open(f'{fn}_{file_counter}.sdf', 'w')
 
-for i in range(0, math.ceil(len(supplier)/bunch)):
-    tf = [mol for mol in supplier[i*bunch:((i+1)*bunch)] if mol is not None]
-    print(i*bunch, ((i+1)*bunch))
-    writer = Chem.SDWriter(f'{fn}_{i}.sdf')
-    for mol in tf:
-        writer.write(mol)
-    writer.close()
+with open(sdf, 'r') as f:
+    for line in f:
+        output_file.write(line)
+        if line.strip() == "$$$$":
+            counter += 1
+            if counter % bunch == 0:
+                output_file.close()
+                file_counter += 1
+                output_file = open(f'{fn}_{file_counter}.sdf', 'w')
+
+output_file.close()
 
 print("File_N.sdf are generated")
