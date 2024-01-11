@@ -25,6 +25,7 @@ with open(sdf, 'r') as f:
                 output_file.close()
                 file_counter += 1
                 output_file = open(f'{fn}_{file_counter}.sdf', 'w')
+                print(f'{fn}_{file_counter}.sdf is generated')
 
 output_file.close()
 
