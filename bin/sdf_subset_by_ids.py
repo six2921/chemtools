@@ -33,7 +33,7 @@ while 1:
             codes = [int(code) for code in codes]
             sub = df.loc[df['code_temp1127'].isin(codes)]
             sub_merge = pd.concat([sub_merge, sub])
-            print('TOTAL:', len(sub_merge), sub_merge[id_column].unique(), )
+            print('TOTAL:', len(list(set(sub_merge))), sub_merge[id_column].unique(), )
         except ValueError:
             print("<Please enter numbers only>")
             continue
