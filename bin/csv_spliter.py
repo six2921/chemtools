@@ -1,4 +1,4 @@
-#! /home/siu/anaconda/envs/chem/bin/python
+#! /home/siu/anaconda/bin/python
 
 import pandas as pd
 import math

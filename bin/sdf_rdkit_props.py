@@ -1,4 +1,4 @@
-#! /home/siu/anaconda/envs/chem/bin/python
+#! /home/siu/anaconda/bin/python
 
 import argparse, os, time, glob, shutil
 from rdkit import Chem
