@@ -1,21 +1,26 @@
 #! /home/siu/anaconda/bin/python
 
-from rdkit.Chem import rdmolfiles
 import argparse
 
-parser = argparse.ArgumentParser(description = 'count num of cpds in mae or maegz')
-parser.add_argument('file', metavar='file', help='input .sdf files')
-args = parser.parse_args()
+def count_dollars(filename):
+    try:
+        with open(filename, 'r', encoding='utf-8') as file:
+            content = file.read()
+            count = content.count('$$$$')
+            return count
+    except FileNotFoundError:
+        print(f"File {filename} not found.")
+        return None
 
-name = args.file
-print(name)
+def main():
+    parser = argparse.ArgumentParser(description="Count occurrences of $$$$ in a text file.")
+    parser.add_argument('filename', type=str, help='The name of the text file to read.')
+    args = parser.parse_args()
 
-if '.sdf' in name:
-    suppl = rdmolfiles.ForwardSDMolSupplier(name)
-    
-    GetNumAtoms = []
-    for mol in suppl:
-        if mol is not None: GetNumAtoms.append(mol.GetNumAtoms())
-    print(len(GetNumAtoms))
-else:
-    print('not sdf file')
+    count = count_dollars(args.filename)
+    if count is not None:
+        print(f"The number of occurrences of $$$$ is: {count}")
+
+if __name__ == '__main__':
+    main()
+
