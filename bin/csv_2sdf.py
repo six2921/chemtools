@@ -1,4 +1,3 @@
-#
 #! /home/siu/anaconda/bin/python
 
 import pandas as pd
