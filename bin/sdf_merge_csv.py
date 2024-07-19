@@ -1,51 +1,54 @@
-#! /home/siu/anaconda/bin/python
+#!/home/siu/anaconda/bin/python
 
 import argparse
 import os
 import pandas as pd
-import rdkit
 from rdkit.Chem import PandasTools
 
-
-parser = argparse.ArgumentParser(description = 'convert maegz to sdf and csv')
-parser.add_argument('sdf', metavar='sdf', help='input .sdf files')
-parser.add_argument('csv', metavar='csv', help='input .csv files')
+# Set up argument parsing
+parser = argparse.ArgumentParser(description='Convert SDF and CSV files and merge them')
+parser.add_argument('sdf', metavar='sdf', help='Input .sdf file')
+parser.add_argument('csv', metavar='csv', help='Input .csv file')
 args = parser.parse_args()
 
+# Load the SDF file into a DataFrame
 sdf = args.sdf
 csv = args.csv
 
 df1 = PandasTools.LoadSDF(sdf, molColName='Molecule')
+print("Columns in the SDF file:")
 for col in df1.columns:
     try:
-        print(col, '|', df1[col][0][:10])
-    except:
+        print(f"{col} | {df1[col][0][:10]}")
+    except Exception:
         pass
 
+# Prompt the user for the key column in the SDF file
 key1 = 'dZ1%mO'
-while key1 not in list(df1.columns):
-    key1 = input('첫번째 파일에 키 컬럼: ')
-print(' ')
-print(' ')
+while key1 not in df1.columns:
+    key1 = input('Enter the key column for the first (SDF) file: ')
+print()
 
+# Load the CSV file into a DataFrame
 df2 = pd.read_csv(csv)
+print("Columns in the CSV file:")
 for col in df2.columns:
     try:
-        print(col, '|', df2[col][0][:10])
-    except:
+        print(f"{col} | {df2[col][0][:10]}")
+    except Exception:
         pass
 
+# Prompt the user for the key column in the CSV file
 key2 = 'dZ1%mO'
-while key2 not in list(df2.columns):
-    key2 = input('두번째 파일에 키 컬럼: ')
-print(' ')
-print(' ')
+while key2 not in df2.columns:
+    key2 = input('Enter the key column for the second (CSV) file: ')
+print()
 
-# how = input('병합 방식 [outer, inner, left, right]: ') # 무조건 left (sdf)에 넣어야 함
-
+# Merge the DataFrames
 df = pd.merge(df1, df2, left_on=key1, right_on=key2, how='left', suffixes=('', '_1'))
 
-fn = os.path.splitext(sdf)[0]
-rdkit.Chem.PandasTools.WriteSDF(df, fn+'_merged.sdf', molColName='Molecule', idName=key2, properties=df.columns, allNumeric=False)
+# Write the merged DataFrame to a new SDF file
+output_sdf = os.path.splitext(sdf)[0] + '_merged.sdf'
+PandasTools.WriteSDF(df, output_sdf, molColName='Molecule', idName=key2, properties=list(df.columns), allNumeric=False)
 
-print('_merged.sdf is generated')
+print(f"{output_sdf} is generated")

@@ -23,18 +23,17 @@ def save_to_sdf(mol_list, output_file):
         writer.write(mol)
     writer.close()
 
-if __name__ == "__main__":
-    # SDF 파일 목록 가져오기
-    sdf_files = glob.glob("*.sdf")
-    
-    # 결과 파일 스킵
-    sdf_files = [f for f in sdf_files if f != "sdf_concator_output.sdf"]
+# SDF 파일 목록 가져오기
+sdf_files = glob.glob("*.sdf")
 
-    # SDF 파일 읽기
-    mol_list = read_sdf_files(sdf_files)
+# 결과 파일 스킵
+sdf_files = [f for f in sdf_files if f != "sdf_concator_output.sdf"]
 
-    # 결과를 새로운 SDF 파일로 저장
-    save_to_sdf(mol_list, "sdf_concator_output.sdf")
+# SDF 파일 읽기
+mol_list = read_sdf_files(sdf_files)
 
-    print("sdf_concator_output.sdf is generated")
+# 결과를 새로운 SDF 파일로 저장
+save_to_sdf(mol_list, "sdf_concator_output.sdf")
+
+print("sdf_concator_output.sdf is generated")
 

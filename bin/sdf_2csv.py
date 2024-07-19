@@ -1,41 +1,39 @@
-#! /home/siu/anaconda/bin/python
+#!/home/siu/anaconda/bin/python
 
 import argparse
+from sdf_modules import split_sdf_file, sdf_to_csv, concat_csv_files, merge_sdf_files
+from pathos.multiprocessing import ProcessingPool
+from tqdm import tqdm
 import os
-from rdkit.Chem import PandasTools
 
-
-parser = argparse.ArgumentParser(description = 'convert maegz to sdf and csv')
-parser.add_argument('sdf', metavar='sdf', help='input .sdf files')
+# Set up argument parsing
+parser = argparse.ArgumentParser(description="Convert SDF file to CSV.")
+parser.add_argument("input_sdf", help="The SDF file to process.")
 args = parser.parse_args()
 
-sdf = args.sdf
+# Split the SDF file
+print("Splitting the SDF file...")
+generated_files = split_sdf_file(args.input_sdf, chunk_size=1000)
 
-df = PandasTools.LoadSDF(sdf, smilesName='smiles_rdkit', molColName='molecule_rdkit')
+# Define a function to convert SDF to CSV
+def process_file(file):
+    print(f"Processing file: {file}")  # Debugging line to ensure correct file paths
+    return sdf_to_csv(file)
 
-# smiles_rdkit으로 생성된 컬럼이름 변경
-if 'smiles' in df.index:
-    pass
-else:
-    df.rename(columns={'smiles_rdkit':'smiles'})
+# Process the split SDF files in parallel
+print("Processing split SDF files in parallel...")
+with ProcessingPool() as pool:
+    list_with_progress = tqdm(generated_files, desc="Processing Files")
+    processed_files = pool.map(process_file, list_with_progress)
 
-# 컬럼 프린트
-for col in df.columns:
-    try:
-        print(col, '|', df[col][0][:10])
-    except:
-        pass
+# Merge the processed CSV files
+print("Merging processed CSV files...")
+merged_csv_file = concat_csv_files(processed_files)
 
-# 입력 스크립트
-name = 'dZ1%mO'
-while name not in list(df.columns):
-    name = input('Write name column: ')
-print(' ')
-print(' ')
+print(f"Process completed. Merged CSV file: {merged_csv_file}")
 
-df.drop('molecule_rdkit', axis=1, inplace=True) # molecule 컬럼 삭제
-
-fn = os.path.splitext(sdf)[0]
-df.to_csv(fn+'.csv', index=False)
-
-print('sdf is converted into csv')
+# Delete the split SDF files and temporary CSV files after merging
+for file in generated_files:
+    os.remove(file)
+for file in processed_files:
+    os.remove(file)
