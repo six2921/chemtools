@@ -8,10 +8,17 @@ from IPython.display import display, clear_output
 
 # 히스토그램 그리는 함수 정의
 def plot_histogram(df, column_name, class_column, min_val, max_val, bin_width, aspect_ratio, save_path=None):
-    data = df[(df[column_name] >= min_val) & (df[column_name] <= max_val)]
+    # 데이터 정렬
+    if class_column != 'None':
+        data = df[(df[column_name] >= min_val) & (df[column_name] <= max_val)].sort_values(by=class_column)
+    else:
+        data = df[(df[column_name] >= min_val) & (df[column_name] <= max_val)]
     
     plt.figure(figsize=(6 * aspect_ratio, 6))
     ax = plt.gca()
+    
+    # width 매개변수를 사용하여 막대의 너비를 조정하고 간격을 둠
+    bar_width = bin_width * 0.8  # 막대의 너비를 줄여서 간격 생성
     
     if class_column != 'None':
         sns.histplot(data, x=column_name, hue=class_column, bins=range(min_val, max_val + bin_width, bin_width), 
@@ -24,6 +31,9 @@ def plot_histogram(df, column_name, class_column, min_val, max_val, bin_width, a
         height = p.get_height()
         if height > 0:
             ax.text(p.get_x() + p.get_width() / 2., height, int(height), ha='center', va='bottom')
+    
+    # x축 눈금 간격 설정
+    plt.xticks(range(min_val, max_val + bin_width, bin_width))
     
     # Y축 그리드 설정
     ax.yaxis.grid(True, linestyle='--', linewidth=0.5)
@@ -79,9 +89,10 @@ def create_widgets_and_display(df):
     # 초기 값 설정
     update_min_max()
 
-    # 입력란과 그래프를 각각 왼쪽과 오른쪽에 배치
+    # 입력란과 그래프를 각각 세로로 가운데 정렬
     input_widgets = VBox(
-        [value_widget, type_widget, min_val_widget, max_val_widget, bin_width_widget, image_ratio_widget]
+        [value_widget, type_widget, min_val_widget, max_val_widget, bin_width_widget, image_ratio_widget],
+        layout=Layout(align_items='center')
     )
 
     output = widgets.Output()
@@ -103,5 +114,5 @@ def create_widgets_and_display(df):
     update_graph()
 
     # 입력란과 그래프를 나란히 배치
-    ui = HBox([VBox([input_widgets, save_button]), output], layout=Layout(align_items='flex-start'))
+    ui = HBox([VBox([input_widgets, save_button]), output], layout=Layout(align_items='center'))
     display(ui)
