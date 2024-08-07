@@ -14,15 +14,10 @@ def plot_histogram(df, column_name, class_column, min_val, max_val, bin_width, a
     ax = plt.gca()
     
     if class_column != 'None':
-        unique_values = data[class_column].unique()
-        colors = sns.color_palette('tab10', len(unique_values))
-        
-        for idx, value in enumerate(unique_values):
-            subset = data[data[class_column] == value]
-            sns.histplot(subset[column_name], bins=range(min_val, max_val + bin_width, bin_width), 
-                         color=colors[idx % len(colors)], label=f'{class_column}={value}', kde=False, ax=ax, alpha=0.5)
+        sns.histplot(data, x=column_name, hue=class_column, bins=range(min_val, max_val + bin_width, bin_width), 
+                     multiple='dodge', kde=False, ax=ax, palette='tab10', shrink=0.8)
     else:
-        sns.histplot(data[column_name], bins=range(min_val, max_val + bin_width, bin_width), kde=False, color='blue', ax=ax)
+        sns.histplot(data[column_name], bins=range(min_val, max_val + bin_width, bin_width), kde=False, color='blue', ax=ax, shrink=0.8)
     
     # 막대 위에 빈도 수 표시
     for p in ax.patches:
@@ -35,12 +30,6 @@ def plot_histogram(df, column_name, class_column, min_val, max_val, bin_width, a
     
     plt.xlabel(column_name)
     plt.ylabel('Count')
-    if class_column != 'None':
-        plt.legend()
-    
-    if save_path:
-        plt.savefig(save_path)
-        print(f"Graph saved as {save_path}")
     
     plt.show()
 
