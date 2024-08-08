@@ -1,6 +1,7 @@
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+import numpy as np
 from ipywidgets import interactive, widgets, HBox, VBox, Layout
 from IPython.display import display, clear_output
 
@@ -17,11 +18,13 @@ def plot_histogram(df, column_name, class_column, min_val, max_val, bin_width, a
     # width 매개변수를 사용하여 막대의 너비를 조정하고 간격을 둠
     bar_width = bin_width * 0.8  # 막대의 너비를 줄여서 간격 생성
     
+    bins = np.arange(min_val, max_val + bin_width, bin_width)
+    
     if class_column != 'None':
-        sns.histplot(data, x=column_name, hue=class_column, bins=range(min_val, max_val + bin_width, bin_width), 
+        sns.histplot(data, x=column_name, hue=class_column, bins=bins, 
                      multiple='dodge', kde=False, ax=ax, palette='tab10', shrink=0.8)
     else:
-        sns.histplot(data[column_name], bins=range(min_val, max_val + bin_width, bin_width), kde=False, color='blue', ax=ax, shrink=0.8)
+        sns.histplot(data[column_name], bins=bins, kde=False, color='blue', ax=ax, shrink=0.8)
     
     # 막대 위에 빈도 수 표시
     for p in ax.patches:
@@ -30,7 +33,7 @@ def plot_histogram(df, column_name, class_column, min_val, max_val, bin_width, a
             ax.text(p.get_x() + p.get_width() / 2., height, int(height), ha='center', va='bottom')
     
     # x축 눈금 간격 설정
-    plt.xticks(range(min_val, max_val + bin_width, bin_width))
+    plt.xticks(bins)
     
     # x축 레이블과 눈금 폰트 사이즈 설정
     ax.set_xlabel(column_name, fontsize=14, fontweight='heavy')  # x축 레이블 폰트 사이즈 설정
@@ -70,9 +73,9 @@ def chart_num(df):
         layout=Layout(width='70%')
     )
 
-    min_val_widget = widgets.IntText(description='Min Value:', style={'description_width': 'initial'}, layout=Layout(width='70%'))
-    max_val_widget = widgets.IntText(description='Max Value:', style={'description_width': 'initial'}, layout=Layout(width='70%'))
-    bin_width_widget = widgets.IntText(value=1, description='Bin Width:', style={'description_width': 'initial'}, layout=Layout(width='70%'))
+    min_val_widget = widgets.FloatText(description='Min Value:', style={'description_width': 'initial'}, layout=Layout(width='70%'))
+    max_val_widget = widgets.FloatText(description='Max Value:', style={'description_width': 'initial'}, layout=Layout(width='70%'))
+    bin_width_widget = widgets.FloatText(value=1.0, description='Bin Width:', style={'description_width': 'initial'}, layout=Layout(width='70%'))
     image_ratio_widget = widgets.FloatText(value=1.0, description='Image Ratio:', style={'description_width': 'initial'}, layout=Layout(width='70%'))
 
     # 그래프를 저장하는 함수
@@ -119,12 +122,6 @@ def chart_num(df):
     # 입력란과 그래프를 나란히 배치
     ui = HBox([VBox([input_widgets, save_button]), output], layout=Layout(align_items='center'))
     display(ui)
-
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
-from ipywidgets import interactive, widgets, HBox, VBox, Layout
-from IPython.display import display, clear_output
 
 # 누적 바 차트를 그리는 함수 정의
 def plot_stacked_bar_chart(df, column):
