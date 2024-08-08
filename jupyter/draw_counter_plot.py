@@ -1,5 +1,3 @@
-# plot_histogram.py
-
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -14,8 +12,7 @@ def plot_histogram(df, column_name, class_column, min_val, max_val, bin_width, a
     else:
         data = df[(df[column_name] >= min_val) & (df[column_name] <= max_val)]
     
-    plt.figure(figsize=(6 * aspect_ratio, 6))
-    ax = plt.gca()
+    fig, ax = plt.subplots(figsize=(6 * aspect_ratio, 6))
     
     # width 매개변수를 사용하여 막대의 너비를 조정하고 간격을 둠
     bar_width = bin_width * 0.8  # 막대의 너비를 줄여서 간격 생성
@@ -35,15 +32,21 @@ def plot_histogram(df, column_name, class_column, min_val, max_val, bin_width, a
     # x축 눈금 간격 설정
     plt.xticks(range(min_val, max_val + bin_width, bin_width))
     
+    # x축 레이블과 눈금 폰트 사이즈 설정
+    ax.set_xlabel(column_name, fontsize=14, fontweight='heavy')  # x축 레이블 폰트 사이즈 설정
+    
     # Y축 그리드 설정
     ax.yaxis.grid(True, linestyle='--', linewidth=0.5)
     
     plt.xlabel(column_name)
     plt.ylabel('Count')
+
+    if save_path:
+        plt.savefig(save_path)
     
     plt.show()
 
-def create_widgets_and_display(df):
+def chart_num(df):
     # int 또는 float 타입의 컬럼만 선택 가능하도록 필터링
     numeric_columns = df.select_dtypes(include=['int', 'float']).columns.tolist()
 
@@ -54,7 +57,7 @@ def create_widgets_and_display(df):
     value_widget = widgets.Dropdown(
         options=numeric_columns,
         value=numeric_columns[0],
-        description='Value:',
+        description='Column:',
         style={'description_width': 'initial'},
         layout=Layout(width='70%')
     )
@@ -92,7 +95,7 @@ def create_widgets_and_display(df):
     # 입력란과 그래프를 각각 세로로 가운데 정렬
     input_widgets = VBox(
         [value_widget, type_widget, min_val_widget, max_val_widget, bin_width_widget, image_ratio_widget],
-        layout=Layout(align_items='center')
+        layout=Layout(align_items='flex-start')
     )
 
     output = widgets.Output()
@@ -115,4 +118,87 @@ def create_widgets_and_display(df):
 
     # 입력란과 그래프를 나란히 배치
     ui = HBox([VBox([input_widgets, save_button]), output], layout=Layout(align_items='center'))
+    display(ui)
+
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+from ipywidgets import interactive, widgets, HBox, VBox, Layout
+from IPython.display import display, clear_output
+
+# 누적 바 차트를 그리는 함수 정의
+def plot_stacked_bar_chart(df, column):
+    data = df[column].astype(str).value_counts(normalize=True).reset_index()
+    data.columns = [column, 'Proportion']
+    data['Count'] = df[column].astype(str).value_counts().values
+
+    fig, ax = plt.subplots(figsize=(3, 3))
+    colors = plt.cm.tab10(range(len(data)))
+    ax.bar(data[column], data['Proportion'], color=colors)
+    
+    # Bar labels
+    for i in range(len(data)):
+        ax.text(i, data['Proportion'][i] / 2, f"{data['Proportion'][i] * 100:.1f}%\n({data['Count'][i]})", 
+                ha='center', va='center', color='black')
+                
+    ax.set_ylabel('Proportion')
+    ax.set_ylim(0, 1)
+    
+    # x축 레이블과 눈금 폰트 사이즈 및 굵기 설정
+    ax.set_xlabel(column, fontsize=14, fontweight='heavy')  # x축 레이블 폰트 사이즈 및 굵기 설정
+
+    plt.xlabel(column)
+    plt.ylabel('Proportion')
+    
+    plt.show()
+    return fig
+
+def chart_category(df):
+    # 유니크 값이 10개 이하인 컬럼 필터링
+    unique_value_columns = [col for col in df.columns if df[col].nunique() <= 10]
+
+    if not unique_value_columns:
+        print("No columns with 10 or fewer unique values.")
+        return
+
+    # 위젯 정의
+    column_widget = widgets.Dropdown(
+        options=unique_value_columns,
+        value=unique_value_columns[0],
+        description='Column:',
+        style={'description_width': 'initial'},
+        layout=Layout(width='70%')
+    )
+
+    output = widgets.Output()
+    save_button = widgets.Button(description="Export PNG", layout=Layout(width='70%'))
+
+    def update_graph(*args):
+        with output:
+            clear_output(wait=True)
+            fig = plot_stacked_bar_chart(df, column_widget.value)
+            save_button.on_click(lambda b: fig.savefig(f"{column_widget.value}.png"))
+
+    def on_button_click(b):
+        fig = plot_stacked_bar_chart(df, column_widget.value)
+        fig.savefig(f"{column_widget.value}.png")
+
+    # 컬럼 선택 시 그래프 업데이트
+    column_widget.observe(update_graph, names='value')
+    save_button.on_click(on_button_click)
+
+    # 초기 그래프 생성
+    update_graph()
+
+    # 입력란과 그래프를 각각 세로로 가운데 정렬
+    input_widgets = VBox(
+        [column_widget, save_button],
+        layout=Layout(align_items='flex-start', width='25%')
+    )
+
+    # UI 구성
+    ui = HBox(
+        [input_widgets, output], 
+        layout=Layout(align_items='center')
+    )
     display(ui)
