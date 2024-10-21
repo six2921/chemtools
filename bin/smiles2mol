@@ -1,0 +1,47 @@
+#!/home/siu/anaconda/bin/python
+
+import argparse
+from rdkit import Chem
+from rdkit.Chem import AllChem
+
+def smiles_to_file(smiles, file_name=None):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        print("Invalid SMILES string")
+        return
+    
+    # 3D 구조 생성
+    mol = Chem.AddHs(mol)  # 수소 추가
+    if AllChem.EmbedMolecule(mol) == -1:
+        print("Failed to generate 3D structure")
+        return
+    
+    # MMFF94로 최적화
+    mmff_props = AllChem.MMFFGetMoleculeProperties(mol, mmffVariant='MMFF94')
+    if mmff_props is None:
+        print("MMFF94 force field parameters could not be generated")
+        return
+    
+    AllChem.MMFFOptimizeMolecule(mol, mmffVariant='MMFF94')
+
+    # 파일 이름 설정
+    if file_name:
+        output_file = f"{file_name}.mol"
+    else:
+        output_file = f"{smiles}.mol"
+
+    # MOL 파일로 저장
+    with open(output_file, 'w') as f:
+        f.write(Chem.MolToMolBlock(mol))
+    
+    print(f"File saved as {output_file}")
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Convert SMILES to MOL file with 3D structure optimization using MMFF94.")
+    parser.add_argument("smiles", type=str, help="SMILES string to convert")
+    parser.add_argument("--name", type=str, help="Output file name without extension (default is SMILES string).")
+    
+    args = parser.parse_args()
+    
+    smiles_to_file(args.smiles, args.name)
+
