@@ -4,7 +4,14 @@ import argparse
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-def smiles_to_file(smiles, file_name=None):
+# argparse 설정 및 인자 파싱
+parser = argparse.ArgumentParser(description="Convert SMILES to MOL file with 3D structure optimization.")
+parser.add_argument("smiles", type=str, help="SMILES string to convert")
+parser.add_argument("--name", type=str, help="Output file name without extension (default is SMILES string).")
+parser.add_argument("--opt", action="store_true", help="Optimize 3D structure using UFF.")
+args = parser.parse_args()
+
+def smiles_to_file(smiles, file_name=None, optimize=False):
     mol = Chem.MolFromSmiles(smiles)
     if mol is None:
         print("Invalid SMILES string")
@@ -16,13 +23,22 @@ def smiles_to_file(smiles, file_name=None):
         print("Failed to generate 3D structure")
         return
     
-    # MMFF94로 최적화
-    mmff_props = AllChem.MMFFGetMoleculeProperties(mol, mmffVariant='MMFF94')
-    if mmff_props is None:
-        print("MMFF94 force field parameters could not be generated")
-        return
-    
-    AllChem.MMFFOptimizeMolecule(mol, mmffVariant='MMFF94')
+    # 최적화 여부 확인
+    if optimize:
+        # UFF로 최적화
+        if mol.GetNumConformers():
+            AllChem.UFFOptimizeMolecule(mol)
+            print("3D structure optimized using UFF.")
+        else:
+            print("Conformer generation failed; skipping optimization.")
+    else:
+        # 기본 MMFF94 최적화
+        mmff_props = AllChem.MMFFGetMoleculeProperties(mol, mmffVariant='MMFF94')
+        if mmff_props is None:
+            print("MMFF94 force field parameters could not be generated")
+            return
+        AllChem.MMFFOptimizeMolecule(mol, mmffVariant='MMFF94')
+        print("3D structure optimized using MMFF94.")
 
     # 파일 이름 설정
     if file_name:
@@ -36,12 +52,6 @@ def smiles_to_file(smiles, file_name=None):
     
     print(f"File saved as {output_file}")
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Convert SMILES to MOL file with 3D structure optimization using MMFF94.")
-    parser.add_argument("smiles", type=str, help="SMILES string to convert")
-    parser.add_argument("--name", type=str, help="Output file name without extension (default is SMILES string).")
-    
-    args = parser.parse_args()
-    
-    smiles_to_file(args.smiles, args.name)
+# 함수 호출
+smiles_to_file(args.smiles, args.name, args.opt)
 
