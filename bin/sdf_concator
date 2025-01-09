@@ -1,5 +1,3 @@
-#! /home/siu/anaconda/bin/python
-
 from rdkit import Chem
 import argparse
 import glob
